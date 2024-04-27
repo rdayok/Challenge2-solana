@@ -11,7 +11,7 @@ const {
 } = require("@solana/web3.js");
 
 const transferSol = async() => {
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const connection = new Connection("http://127.0.0.1:8899", "confirmed");
 
     // Generate a new keypair
     const from = Keypair.generate();
@@ -39,12 +39,18 @@ const transferSol = async() => {
 
     console.log("Airdrop completed for the Sender account");
 
+    let fromBalance = await connection.getBalance(
+        new PublicKey(from.publicKey)
+    );
+   
+    const solToTransfer = parseInt(fromBalance) / 2;
+
     // Send money from "from" wallet and into "to" wallet
     var transaction = new Transaction().add(
         SystemProgram.transfer({
             fromPubkey: from.publicKey,
             toPubkey: to.publicKey,
-            lamports: LAMPORTS_PER_SOL / 100
+            lamports: solToTransfer
         })
     );
 
@@ -55,6 +61,7 @@ const transferSol = async() => {
         [from]
     );
     console.log('Signature is', signature);
+
 }
 
 transferSol();
